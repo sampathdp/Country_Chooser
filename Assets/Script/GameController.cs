@@ -10,14 +10,9 @@ public class GameController : MonoBehaviour
 
     [SerializeField] GameObject ParentObjImage;
     [SerializeField] GameObject ParentObjText;
-    
+    [SerializeField] ScrollRectSnap scrollRect_I;
+    [SerializeField] ScrollRectSnap scrollRect_T;
 
-    [SerializeField] SwipeMenu swipeMenu_I;
-    [SerializeField] SwipeMenu swipeMenu_T;
-    [SerializeField] Scrollbar scrollBar;
-    [SerializeField] GameObject scrollBarName;
-    [SerializeField] GameObject scrollBarImage;
-    
 
     [Header("UI Menu")]
     [SerializeField] TextMeshProUGUI _countryName;
@@ -25,20 +20,40 @@ public class GameController : MonoBehaviour
     [SerializeField] Image _countryImage;
     [SerializeField] Sprite _countryImg;
     [SerializeField] GameObject[] bullets;
+    [SerializeField] GameObject pnlAnswers;
+
+    [SerializeField] TextMeshProUGUI _MsgAnswerPnl;
+    [SerializeField] TextMeshProUGUI _countryNameAnswerPnl;
+    [SerializeField] TextMeshProUGUI _capitalCityAnswerPnl_A;
+    [SerializeField] TextMeshProUGUI _capitalCityAnswerPnl_C;
+    [SerializeField] TextMeshProUGUI _scoretxt;
+    [SerializeField] TextMeshProUGUI _scoretxtAnswerPn;
+
+    [SerializeField] Image _countryImgAnswerPnl_A;
+    [SerializeField] Image _countryImgAnswerPnl_C;
+    [SerializeField] Sprite _correctImgAnswerPnl;
+    [SerializeField] Sprite _inCorrectImgAnswerPnl;
+    [SerializeField] Image _correctImgAnswerPnl_1;
+    [SerializeField] Image _correctImgAnswerPnl_2;
+
+    [SerializeField] Button _Btn;
+
 
     bool LevelPass;
-    bool QMarkVisible;
+    public bool isActiveAnswerPnl;
+    public bool _GameOver;
+
 
     int countryID;
     int lvlPassCount;
     int subLvlCount;
+    int score;
 
     public static GameController instance;
 
     private void Awake()
     {
         instance = this;
-        QMarkVisible = true;
     }
 
     private void Start()
@@ -51,12 +66,6 @@ public class GameController : MonoBehaviour
         ScrollRandomizeCityName();
         SetCountryNameImg();
         _countryImage.sprite = _countryImg;
-    }
-
-    private void Update()
-    {
-        if (QMarkVisible)
-            _countryImage.sprite = _countryImg;
     }
 
     void ScrollRandomizeImages()
@@ -80,7 +89,6 @@ public class GameController : MonoBehaviour
             if (ParentObjText.transform.GetChild(i).GetComponent<TextMeshProUGUI>() != null)
                 ParentObjText.transform.GetChild(i).GetComponent<TextMeshProUGUI>().text = countyImages.countyID[countryID].countyImages[i]._cityName;
         }
-        scrollBarName.GetComponent<ScrollRect>().verticalNormalizedPosition = 1;
     }
 
     void SetCountryNameImg()
@@ -91,45 +99,73 @@ public class GameController : MonoBehaviour
 
     public void ChangeMainImage()
     {
-        if (scrollBar.GetComponent<Scrollbar>().value > 0)
-        {
-            _countryImage.sprite = ParentObjImage.transform.GetChild(swipeMenu_I.position).GetComponent<Image>().sprite;
-        }
+        _countryImage.sprite = countyImages.countyID[countryID].countyImages[scrollRect_I.minButtonNum]._countryImgSQ;
 
     }
 
     public void SelectCountryCityImg()
     {
-
-        Timer.instance.resetTime();
-        Timer.instance.timer();
-        string countryName = countyImages.countyID[countryID].countryCity;
-        Sprite countryImage = _countryImage.GetComponent<Image>().sprite;
-
-        string IcountryName = ParentObjText.transform.GetChild(swipeMenu_T.position).GetComponent<TextMeshProUGUI>().text.ToString();
-        Sprite IcountryImage = ParentObjImage.transform.GetChild(swipeMenu_I.position).GetComponent<Image>().sprite;
-
-        if (countryImage != null && countryName != null)
+        if (!_GameOver)
         {
-            if (countryName == IcountryName && countryImage == IcountryImage)
+            StartCoroutine(ShowAnswerPanal());
+
+            string countryName = _countryName.GetComponent<TextMeshProUGUI>().text.ToString();
+            string cityName = countyImages.countyID[countryID].countryCity;
+            Sprite countryImage = countyImages.countyID[countryID]._countryImg;
+
+            string ICapitalCityName = ParentObjText.transform.GetChild(scrollRect_T.minButtonNum).GetComponent<TextMeshProUGUI>().text.ToString();
+            Sprite IcountryImage = ParentObjImage.transform.GetChild(scrollRect_I.minButtonNum).GetComponent<Image>().sprite;
+
+            if (countryImage != null && cityName != null)
             {
-                print(countryName +" " +   IcountryName+ " X");
-                print(countryImage + "  "+IcountryImage+" X");
-                LevelPass = true;
-            }
-            else
-            {
-                print(countryName + " " + IcountryName + " Y");
-                print(countryImage + "  " + IcountryImage + " Y");
-                Lives.Instance.UpdateLives();
-                LevelPass = false;
-            }
+                if (cityName == ICapitalCityName && countryImage == IcountryImage)
+                {
+                    LevelPass = true;
+                    score++;
+                    _scoretxt.text = score.ToString();
+                }
+                else
+                {
+                    Lives.Instance.UpdateLives();
+                    LevelPass = false;
+                }
+
+                //Answer Panal Details
+                if (cityName == ICapitalCityName)
+                {
+                    _correctImgAnswerPnl_1.sprite = _correctImgAnswerPnl;
+                }
+                if (cityName != ICapitalCityName)
+                {
+                    _correctImgAnswerPnl_1.sprite = _inCorrectImgAnswerPnl;
+                }
+                if (countryImage == IcountryImage)
+                {
+                    _correctImgAnswerPnl_2.sprite = _correctImgAnswerPnl;
+                }
+                if (countryImage != IcountryImage)
+                {
+                    _correctImgAnswerPnl_2.sprite = _inCorrectImgAnswerPnl;
+                }
 
 
-            RandomizeCountryID();
-            LoadNextLevel();
-            CheckWinTimes();
+                _countryNameAnswerPnl.text = countryName;
+                _capitalCityAnswerPnl_A.text = ICapitalCityName;
+                _capitalCityAnswerPnl_C.text = cityName;
+
+                _countryImgAnswerPnl_A.sprite = countryImage;
+                _countryImgAnswerPnl_C.sprite = IcountryImage;
+                _scoretxtAnswerPn.text = "Your Score " + score.ToString();
+
+                //Answer Panal Details
+
+                RandomizeCountryID();
+                LoadNextLevel();
+                CheckWinTimes();
+                ScrollRectSnap.Instance.GoToBtn(1);
+            }
         }
+
 
     }
 
@@ -162,7 +198,10 @@ public class GameController : MonoBehaviour
     {
         subLvlCount++;
         if (subLvlCount == 3)
+        {
             Lives.Instance.UpdateLives();
+            _GameOver = true;
+        }
         else
             LoadSubNextLevel();
     }
@@ -202,7 +241,17 @@ public class GameController : MonoBehaviour
             countryID = Rand;
         }
         print(countryID);
-
+    }
+    IEnumerator ShowAnswerPanal()
+    {
+        _Btn.interactable = false;
+        isActiveAnswerPnl = true;
+        //pnlAnswers.SetActive(true);
+        yield return new WaitForSeconds(2f);
+        _Btn.interactable = true;
+        isActiveAnswerPnl = false;
+        //pnlAnswers.SetActive(false);
+        Timer.instance.resetTime();
 
     }
 

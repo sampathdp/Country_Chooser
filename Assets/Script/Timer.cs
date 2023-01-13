@@ -18,10 +18,12 @@ public class Timer : MonoBehaviour
     {
         timeLeft = maxTime;
         instance = this;
+        Invoke("timer", 1.2f);
     }
     private void Update()
     {
-        timer();
+        if(!GameController.instance.isActiveAnswerPnl)
+            Invoke("timer",1.2f);
     }
     public void resetTime()
     {
@@ -30,7 +32,7 @@ public class Timer : MonoBehaviour
 
     public void timer()
     {
-        if (timeLeft > 0)
+        if (timeLeft > 0 && !GameController.instance._GameOver)
         {
             timeLeft -= Time.deltaTime;
             timerBar.fillAmount = timeLeft / maxTime;

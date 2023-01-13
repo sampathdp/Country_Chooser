@@ -17,8 +17,6 @@ public class Lives : MonoBehaviour
     [SerializeField] Sprite EmptyHeart;
     [SerializeField] Button Next_Btn;
 
-    public bool gameOver;
-
     private void Awake()
     {
         Instance = this;
@@ -32,7 +30,7 @@ public class Lives : MonoBehaviour
             _lives = maxLives;
 
 
-        if (Timer.instance.timesUp && !gameOver)
+        if (Timer.instance.timesUp && !GameController.instance._GameOver)
             _lives--;
 
         for (int i = 0; i < hearts.Length; i++)
@@ -52,11 +50,11 @@ public class Lives : MonoBehaviour
 
     public void UpdateLives()
     {
-        if (!gameOver)
+        if (!GameController.instance._GameOver)
             _lives--;
         if (_lives <= 0)
         {
-            gameOver = true;
+            GameController.instance._GameOver = true;
             Next_Btn.interactable = false;
             Invoke("loadPanal", 1f);
 

@@ -21,5 +21,6 @@ public class CountyImages
     public string _countryName;
     public string _cityName;
     public Sprite _countryImg;
+    public Sprite _countryImgSQ;
 }
 
