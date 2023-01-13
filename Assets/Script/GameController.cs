@@ -246,11 +246,11 @@ public class GameController : MonoBehaviour
     {
         _Btn.interactable = false;
         isActiveAnswerPnl = true;
-        //pnlAnswers.SetActive(true);
+        pnlAnswers.SetActive(true);
         yield return new WaitForSeconds(2f);
         _Btn.interactable = true;
         isActiveAnswerPnl = false;
-        //pnlAnswers.SetActive(false);
+        pnlAnswers.SetActive(false);
         Timer.instance.resetTime();
 
     }

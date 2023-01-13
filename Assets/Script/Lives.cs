@@ -45,6 +45,8 @@ public class Lives : MonoBehaviour
             else
                 hearts[i].enabled = false;
         }
+        if (GameController.instance._GameOver)
+            Invoke("loadPanal", 1f);
     }
 
 
